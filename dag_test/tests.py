@@ -1,8 +1,5 @@
 """
-This file demonstrates two different styles of tests (one doctest and one
-unittest). These will both pass when you run "manage.py test".
-
-Replace these with more appropriate tests for your application.
+Unit tests for django-dag
 """
 
 
@@ -31,8 +28,6 @@ __test__ = {"doctest": """
 >>> p3.add_child(p7)
 >>> p6.add_child(p7)
 >>> p6.add_child(p8)
-
-Should raise an error:
 
 >>> l=[p.pk for p in p2.descendants_set()]
 >>> l.sort()
@@ -77,6 +72,21 @@ Test additional fields for edge
 >>> p9.children.through.objects.filter(child=p10)[0].name
 u'test_name'
 
+>>> p1.path(p7)
+[<ConcreteNode: # 6>, <ConcreteNode: # 7>]
+
+>>> p1.path(p10)
+[<ConcreteNode: # 6>, <ConcreteNode: # 9>, <ConcreteNode: # 10>]
+
+>>> p1.distance(p7)
+2
+
+>>> p1.get_leaves()
+set([<ConcreteNode: # 8>, <ConcreteNode: # 10>, <ConcreteNode: # 7>])
+
+
+>>> p8.get_roots()
+set([<ConcreteNode: # 1>, <ConcreteNode: # 2>, <ConcreteNode: # 4>])
 
 
 """}

@@ -13,7 +13,7 @@ from django.core.exceptions import ValidationError
 
 class NodeNotReachableException (Exception):
     """
-    Exception for vertex distance and path
+    Exception for node distance and path
     """
     pass
 
@@ -34,7 +34,7 @@ class NodeBase(object):
 
     def add_child(self, descendant, **kwargs):
         """
-        Adds a parent
+        Adds a child
         """
         args = kwargs
         args.update({'parent' : self, 'child' : descendant })
@@ -119,6 +119,41 @@ class NodeBase(object):
             raise NodeNotReachableException
         return path
 
+    def is_root(self):
+        """
+        Check if has ancestors
+        """
+        return not self.ancestors_set()
+
+    def is_leaf(self):
+        """
+        Check if has children
+        """
+        return not self.children.count()
+
+    def get_roots(self, allow_self = False):
+        """
+        Returns root nodes, if any
+        """
+        roots = set()
+        at =  self.ancestors_tree()
+        for a in at:
+            roots.update(a.get_roots(True))
+        if allow_self and not at:
+            return set([self])
+        return roots
+
+    def get_leaves(self, allow_self = False):
+        """
+        Returns leaves nodes, if any
+        """
+        leaves = set()
+        at =  self.descendants_tree()
+        for a in at:
+            leaves.update(a.get_leaves(True))
+        if allow_self and not at:
+            return set([self])
+        return leaves
 
 
     @staticmethod
