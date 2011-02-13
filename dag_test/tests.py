@@ -88,6 +88,24 @@ set([<ConcreteNode: # 8>, <ConcreteNode: # 10>, <ConcreteNode: # 7>])
 >>> p8.get_roots()
 set([<ConcreteNode: # 1>, <ConcreteNode: # 2>, <ConcreteNode: # 4>])
 
+>>> p1.is_root()
+True
+
+>>> p1.is_leaf()
+False
+
+>>> p10.is_root()
+False
+
+>>> p10.is_leaf()
+True
+
+>>> p6.is_root()
+False
+
+>>> p6.is_leaf()
+False
+
 
 """}
 

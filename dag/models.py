@@ -131,28 +131,50 @@ class NodeBase(object):
         """
         return not self.children.count()
 
-    def get_roots(self, allow_self = False):
+    @staticmethod
+    def _get_roots(a, at):
         """
-        Returns root nodes, if any
+        Works on objects: no queries
         """
+        if not at:
+          return set([a])
         roots = set()
-        at =  self.ancestors_tree()
-        for a in at:
-            roots.update(a.get_roots(True))
-        if allow_self and not at:
-            return set([self])
+        for a2 in at:
+            roots.update(a2._get_roots(a2, at[a2]))
         return roots
 
-    def get_leaves(self, allow_self = False):
+    def get_roots(self):
+        """
+        Returns roots nodes, if any
+        """
+        at =  self.ancestors_tree()
+        roots = set()
+        for a in at:
+            roots.update(a._get_roots(a, at[a]))
+        return roots
+
+
+
+    @staticmethod
+    def _get_leaves(d, dt):
+        """
+        Works on objects: no queries
+        """
+        if not dt:
+          return set([d])
+        leaves = set()
+        for d2 in dt:
+            leaves.update(d2._get_leaves(d2, dt[d2]))
+        return leaves
+
+    def get_leaves(self):
         """
         Returns leaves nodes, if any
         """
+        dt =  self.descendants_tree()
         leaves = set()
-        at =  self.descendants_tree()
-        for a in at:
-            leaves.update(a.get_leaves(True))
-        if allow_self and not at:
-            return set([self])
+        for d in dt:
+            leaves.update(d._get_leaves(d, dt[d]))
         return leaves
 
 
