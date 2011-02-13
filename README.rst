@@ -6,8 +6,8 @@ Django-dag is a small reusable app which implements a Directed Acyclic Graph.
 Usage
 .....
 
-Django-dag uses abstract base classes, to use it you must crete your own
-concrete class which inherits from Django-dag classes.
+Django-dag uses abstract base classes, to use it you must create your own
+concrete classes that inherit from Django-dag classes.
 
 The `dag_test` app contains a simple example and a unit test to show
 you its usage.
