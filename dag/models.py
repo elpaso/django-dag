@@ -209,14 +209,6 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
 
     return Edge
 
-
-"""
-Django's ORM is somewhat magical. We can't monkeypatch AL_Node
-(e.g. do stuff like AL_Node.parents = models.ManyToManyField(...))
-so we have put all functionality in a base class, and use a factory
-to fill in the details of the Node model.
-"""
-
 def node_factory(edge_model_name, children_null = True):
     """
     Dag Node factory
