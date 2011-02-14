@@ -1,0 +1,4 @@
+include CHANGES LICENSE NOTICE README UPDATING MANIFEST.in
+recursive-include README *.py *.rst
+recursive-include dag *.py *.html
+recursive-include dag_test *.py *.html
