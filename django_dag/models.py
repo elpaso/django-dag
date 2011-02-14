@@ -189,11 +189,11 @@ class NodeBase(object):
 
 
 
-def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", concrete = True):
+def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", concrete = True, base_model = models.Model):
     """
     Dag Edge factory
     """
-    class Edge(models.Model):
+    class Edge(base_model):
         class Meta:
             abstract = not concrete
 
@@ -209,11 +209,11 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
 
     return Edge
 
-def node_factory(edge_model_name, children_null = True):
+def node_factory(edge_model_name, children_null = True, base_model = models.Model):
     """
     Dag Node factory
     """
-    class Node(models.Model, NodeBase):
+    class Node(base_model, NodeBase):
         class Meta:
             abstract        = True
 

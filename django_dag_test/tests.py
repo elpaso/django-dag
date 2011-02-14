@@ -5,7 +5,7 @@ Unit tests for django-dag
 
 __test__ = {"doctest": """
 
->>> from dag_test.models import ConcreteNode
+>>> from django_dag_test.models import ConcreteNode
 >>> for i in range(1,11):
 ...     ConcreteNode(name = "%s" % i).save()
 

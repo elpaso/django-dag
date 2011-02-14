@@ -29,7 +29,6 @@ class RecurseDictNode(template.Node):
 
         for k, v in vals:
             context.push()
-            import ipy; ipy.shell()
 
             context['level'] = level
             context['key'] = k

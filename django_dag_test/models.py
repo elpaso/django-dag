@@ -1,6 +1,6 @@
 from django.db import models
 
-from dag.models import *
+from django_dag.models import *
 # Create your models here.
 
 

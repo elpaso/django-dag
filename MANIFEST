@@ -1,9 +1,5 @@
 MANIFEST.in
 README
 setup.py
-dag/__init__.py
-dag/models.py
-dag_test/__init__.py
-dag_test/models.py
-dag_test/tests.py
-dag_test/views.py
+django_dag/__init__.py
+django_dag/models.py
