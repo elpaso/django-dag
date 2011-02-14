@@ -131,16 +131,15 @@ class NodeBase(object):
         """
         return not self.children.count()
 
-    @staticmethod
-    def _get_roots(a, at):
+    def _get_roots(self, at):
         """
         Works on objects: no queries
         """
         if not at:
-          return set([a])
+          return set([self])
         roots = set()
         for a2 in at:
-            roots.update(a2._get_roots(a2, at[a2]))
+            roots.update(a2._get_roots(at[a2]))
         return roots
 
     def get_roots(self):
@@ -150,21 +149,18 @@ class NodeBase(object):
         at =  self.ancestors_tree()
         roots = set()
         for a in at:
-            roots.update(a._get_roots(a, at[a]))
+            roots.update(a._get_roots(at[a]))
         return roots
 
-
-
-    @staticmethod
-    def _get_leaves(d, dt):
+    def _get_leaves(self, dt):
         """
         Works on objects: no queries
         """
         if not dt:
-          return set([d])
+          return set([self])
         leaves = set()
         for d2 in dt:
-            leaves.update(d2._get_leaves(d2, dt[d2]))
+            leaves.update(d2._get_leaves(dt[d2]))
         return leaves
 
     def get_leaves(self):
@@ -174,15 +170,18 @@ class NodeBase(object):
         dt =  self.descendants_tree()
         leaves = set()
         for d in dt:
-            leaves.update(d._get_leaves(d, dt[d]))
+            leaves.update(d._get_leaves(dt[d]))
         return leaves
 
 
     @staticmethod
     def circular_checker(parent, child):
         """
-        Checks that the object is not an ancestor or a descendant
+        Checks that the object is not an ancestor or a descendant,
+        avoid self links
         """
+        if parent == child:
+            raise ValidationError('Self links are not allowed')
         if child in parent.ancestors_set():
             raise ValidationError('The object is an ancestor.')
         if child in parent.descendants_set():
@@ -190,9 +189,9 @@ class NodeBase(object):
 
 
 
-def edge_factory(node_model, child_to_field="id", parent_to_field="id", concrete=True):
+def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", concrete = True):
     """
-    Dag Edge
+    Dag Edge factory
     """
     class Edge(models.Model):
         class Meta:
@@ -219,9 +218,12 @@ to fill in the details of the Node model.
 """
 
 def node_factory(edge_model_name, children_null = True):
+    """
+    Dag Node factory
+    """
     class Node(models.Model, NodeBase):
         class Meta:
-            abstract = True
+            abstract        = True
 
         children  = models.ManyToManyField(
                 'self',
@@ -230,8 +232,8 @@ def node_factory(edge_model_name, children_null = True):
                 symmetrical = False,
                 through     = edge_model_name)
 
-        parent_field        = '%s_parent' % edge_model_name.lower()
-        child_field         = '%s_child' % edge_model_name.lower()
+        parent_field    = '%s_parent' % edge_model_name.lower()
+        child_field     = '%s_child' % edge_model_name.lower()
 
     return Node
 

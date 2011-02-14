@@ -106,6 +106,10 @@ False
 >>> p6.is_leaf()
 False
 
+>>> p6.add_child(p6)
+Traceback (most recent call last):
+    ...
+ValidationError: [u'Self links are not allowed']
 
 """}
 
