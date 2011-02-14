@@ -111,5 +111,25 @@ Traceback (most recent call last):
     ...
 ValidationError: [u'Self links are not allowed']
 
+Remove a link and test island
+
+>>> p10.remove_parent(p9)
+>>> p10 in p9.descendants_set()
+False
+
+>>> p10.is_island()
+True
+
+>>> p6.ancestors_set()
+set([<ConcreteNode: # 1>, <ConcreteNode: # 2>, <ConcreteNode: # 4>])
+
+>>> p1.remove_child(p6)
+>>> p6.ancestors_set()
+set([<ConcreteNode: # 2>, <ConcreteNode: # 4>])
+
+>>> p1 in p6.ancestors_set()
+False
+
+
 """}
 

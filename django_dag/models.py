@@ -48,6 +48,18 @@ class NodeBase(object):
         """
         return parent.add_child(self, **kwargs)
 
+    def remove_child(self, descendant):
+        """
+        Removes a child
+        """
+        self.children.through.objects.get(parent = self, child = descendant).delete()
+
+    def remove_parent(self, parent):
+        """
+        Removes a parent
+        """
+        parent.children.through.objects.get(parent = parent, child = self).delete()
+
     def parents(self):
         """
         Returns all elements which have 'self' as a direct descendant
@@ -121,15 +133,21 @@ class NodeBase(object):
 
     def is_root(self):
         """
-        Check if has ancestors
+        Check if has children and not ancestors
         """
-        return not self.ancestors_set()
+        return bool(self.children.count() and not self.ancestors_set())
 
     def is_leaf(self):
         """
-        Check if has children
+        Check if has ancestors and not children
         """
-        return not self.children.count()
+        return bool(self.ancestors_set() and not self.children.count())
+
+    def is_island(self):
+        """
+        Check if has no ancestors nor children
+        """
+        return bool(not self.is_root() and not self.is_leaf())
 
     def _get_roots(self, at):
         """
@@ -193,12 +211,20 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
     """
     Dag Edge factory
     """
+    if isinstance(node_model, str):
+        try:
+            node_model_name = node_model.split('.')[1]
+        except IndexError:
+            node_model_name = node_model
+    else:
+        node_model_name = node_mode._meta.module_name
+
     class Edge(base_model):
         class Meta:
             abstract = not concrete
 
-        parent = models.ForeignKey(node_model, related_name="%s_child" % node_model, to_field=parent_to_field)
-        child = models.ForeignKey(node_model, related_name="%s_parent" % node_model, to_field=child_to_field)
+        parent = models.ForeignKey(node_model, related_name = "%s_child" % node_model_name, to_field = parent_to_field)
+        child = models.ForeignKey(node_model, related_name = "%s_parent" % node_model_name, to_field = child_to_field)
 
         def __unicode__(self):
             return "%s is child of %s" % (self.child, self.parent)
@@ -209,7 +235,7 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
 
     return Edge
 
-def node_factory(edge_model_name, children_null = True, base_model = models.Model):
+def node_factory(edge_model, children_null = True, base_model = models.Model):
     """
     Dag Node factory
     """
@@ -222,10 +248,7 @@ def node_factory(edge_model_name, children_null = True, base_model = models.Mode
                 null        = children_null,
                 blank       = children_null,
                 symmetrical = False,
-                through     = edge_model_name)
-
-        parent_field    = '%s_parent' % edge_model_name.lower()
-        child_field     = '%s_child' % edge_model_name.lower()
+                through     = edge_model)
 
     return Node
 

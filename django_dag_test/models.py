@@ -10,7 +10,7 @@ class ConcreteNode(node_factory('ConcreteEdge')):
     """
     name = models.CharField(max_length = 32)
 
-class ConcreteEdge (edge_factory(ConcreteNode, concrete = False)):
+class ConcreteEdge (edge_factory('ConcreteNode', concrete = False)):
     """
     Test edge, adds just one field
     """
