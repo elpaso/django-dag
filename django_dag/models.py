@@ -217,7 +217,7 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
         except IndexError:
             node_model_name = node_model
     else:
-        node_model_name = node_mode._meta.module_name
+        node_model_name = node_model._meta.module_name
 
     class Edge(base_model):
         class Meta:
