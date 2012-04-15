@@ -147,7 +147,7 @@ class NodeBase(object):
         """
         Check if has no ancestors nor children
         """
-        return bool(not self.is_root() and not self.is_leaf())
+        return bool(not self.children.count() and not self.ancestors_set())
 
     def _get_roots(self, at):
         """
