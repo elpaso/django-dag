@@ -248,7 +248,8 @@ def node_factory(edge_model, children_null = True, base_model = models.Model):
                 null        = children_null,
                 blank       = children_null,
                 symmetrical = False,
-                through     = edge_model)
+                through     = edge_model,
+                related_name = '_parents') # NodeBase.parents() is a function
 
     return Node
 
