@@ -135,19 +135,19 @@ class NodeBase(object):
         """
         Check if has children and not ancestors
         """
-        return bool(self.children.count() and not self.ancestors_set())
+        return bool(self.children.exists() and not self._parents.exists())
 
     def is_leaf(self):
         """
         Check if has ancestors and not children
         """
-        return bool(self.ancestors_set() and not self.children.count())
+        return bool(self._parents.exists() and not self.children.exists())
 
     def is_island(self):
         """
         Check if has no ancestors nor children
         """
-        return bool(not self.children.count() and not self.ancestors_set())
+        return bool(not self.children.exists() and not self._parents.exists())
 
     def _get_roots(self, at):
         """
@@ -248,7 +248,8 @@ def node_factory(edge_model, children_null = True, base_model = models.Model):
                 null        = children_null,
                 blank       = children_null,
                 symmetrical = False,
-                through     = edge_model)
+                through     = edge_model,
+                related_name = '_parents') # NodeBase.parents() is a function
 
     return Node
 
