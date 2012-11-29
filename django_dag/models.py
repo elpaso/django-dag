@@ -38,8 +38,9 @@ class NodeBase(object):
         """
         args = kwargs
         args.update({'parent' : self, 'child' : descendant })
+        disable_check = args.pop('disable_circular_check', False)
         cls = self.children.through(**kwargs)
-        return cls.save()
+        return cls.save(disable_circular_check=disable_check)
 
 
     def add_parent(self, parent, *args, **kwargs):
@@ -230,7 +231,8 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
             return "%s is child of %s" % (self.child, self.parent)
 
         def save(self, *args, **kwargs):
-            self.parent.__class__.circular_checker(self.parent, self.child)
+            if not kwargs.pop('disable_circular_check', False):
+                self.parent.__class__.circular_checker(self.parent, self.child)
             super(Edge, self).save(*args, **kwargs) # Call the "real" save() method.
 
     return Edge
