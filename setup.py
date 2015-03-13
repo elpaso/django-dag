@@ -3,7 +3,7 @@
 import os
 from distutils.core import setup
 
-version = '1.1'
+version = '1.3'
 
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -32,7 +32,7 @@ setup(
     packages=['django_dag'],
     package_dir={'django_dag': 'django_dag'},
     #package_data={'dag': ['templates/admin/*.html']},
-    description='Directed Acyclic Graph implementation for Django 1.0+',
+    description='Directed Acyclic Graph implementation for Django 1.6+',
     classifiers=classifiers,
     long_description=long_desc,
 )

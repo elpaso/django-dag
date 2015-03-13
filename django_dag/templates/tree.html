@@ -1,0 +1,9 @@
+{% load dag_tags %}{% for dag_instance in dag_list %}{{ dag_instance }}
+{% if dag_instance.is_root %}Descendants:
+{% recursedict dag_instance.descendants_tree %}{% loop %}{% if key %}{{ key }}
+{% endif %}{% value %}
+{% endloop %}{% endrecursedict %}{% endif %}
+{% if dag_instance.is_leaf %}Ancestors:
+{% recursedict dag_instance.ancestors_tree %}{% loop %}{% if key %}{{ key }}{% endif %}
+{% value %}
+{% endloop %}{% endrecursedict %}{% endif %}{% endfor %}

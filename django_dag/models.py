@@ -200,7 +200,7 @@ class NodeBase(object):
         avoid self links
         """
         if parent == child:
-            raise ValidationError('Self links are not allowed')
+            raise ValidationError('Self links are not allowed.')
         if child in parent.ancestors_set():
             raise ValidationError('The object is an ancestor.')
         if child in parent.descendants_set():

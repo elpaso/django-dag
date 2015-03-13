@@ -66,7 +66,7 @@ class RecurseDictNode(template.Node):
 def recursedict_tag(parser, token):
     bits = list(token.split_contents())
     if len(bits) != 2 and bits[0] != 'recursedict':
-        raise template.TemplateSyntaxError, "Invalid tag syxtax expected '{% recursedict [dictVar] %}'"
+        raise template.TemplateSyntaxError, "Invalid tag syntax expected '{% recursedict [dictVar] %}'"
 
     var = parser.compile_filter(bits[1])
     nodeList = {}
