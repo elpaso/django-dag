@@ -85,25 +85,37 @@ class NodeBase(object):
             tree[f] = f.ancestors_tree()
         return tree
 
-    def descendants_set(self):
+    def descendants_set(self, cached_results=None):
         """
         Returns a set of descendants
         """
-        res = set()
-        for f in self.children.all():
-            res.add(f)
-            res.update(f.descendants_set())
-        return res
+        if cached_results is None:
+            cached_results = dict()
+        if self in cached_results.keys():
+            return cached_results[self]
+        else:
+            res = set()
+            for f in self.children.all():
+                res.add(f)
+                res.update(f.descendants_set(cached_results=cached_results))
+            cached_results[self] = res
+            return res
 
-    def ancestors_set(self):
+    def ancestors_set(self, cached_results=None):
         """
         Returns a set of ancestors
         """
-        res = set()
-        for f in self.parents():
-            res.add(f)
-            res.update(f.ancestors_set())
-        return res
+        if cached_results is None:
+            cached_results = dict()
+        if self in cached_results.keys():
+            return cached_results[self]
+        else:
+            res = set()
+            for f in self.parents():
+                res.add(f)
+                res.update(f.ancestors_set(cached_results=cached_results))
+            cached_results[self] = res
+            return res
 
     def distance(self, target):
         """
@@ -196,16 +208,12 @@ class NodeBase(object):
     @staticmethod
     def circular_checker(parent, child):
         """
-        Checks that the object is not an ancestor or a descendant,
-        avoid self links
+        Checks that the object is not an ancestor, avoid self links
         """
         if parent == child:
             raise ValidationError('Self links are not allowed.')
         if child in parent.ancestors_set():
             raise ValidationError('The object is an ancestor.')
-        if child in parent.descendants_set():
-            raise ValidationError('The object is a descendant.')
-
 
 
 def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", concrete = True, base_model = models.Model):
@@ -254,4 +262,3 @@ def node_factory(edge_model, children_null = True, base_model = models.Model):
                 related_name = '_parents') # NodeBase.parents() is a function
 
     return Node
-
