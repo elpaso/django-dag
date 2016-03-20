@@ -137,7 +137,7 @@ class NodeBase(object):
             try:
                 if edge[0].distance(edge[1]) == 1:
                     edges.add(edge)
-            except NodeNotReachableException:
+            except (NodeNotReachableException, TypeError):
                 pass
         return edges
 
