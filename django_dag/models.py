@@ -6,6 +6,7 @@ Some ideas stolen from: from https://github.com/stdbrouw/django-treebeard-dag
 
 """
 
+from itertools import permutations
 
 from django.db import models
 from django.core.exceptions import ValidationError
@@ -116,6 +117,29 @@ class NodeBase(object):
                 res.update(f.ancestors_set(cached_results=cached_results))
             cached_results[self] = res
             return res
+
+    def nodes_set(self):
+        """
+        Retrun a set of all nodes
+        """
+        nodes = set()
+        nodes.add(self)
+        nodes.update(self.ancestors_set())
+        nodes.update(self.descendants_set())
+        return nodes
+
+    def edges_set(self):
+        """
+        Returns a set of all edges
+        """
+        edges = set()
+        for edge in permutations(self.nodes_set(), 2):
+            try:
+                if edge[0].distance(edge[1]) == 1:
+                    edges.add(edge)
+            except (NodeNotReachableException, TypeError):
+                pass
+        return edges
 
     def distance(self, target):
         """
