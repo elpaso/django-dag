@@ -75,7 +75,7 @@ class DagTestCase(TestCase):
 
         try:
             p2.add_child(p8)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(unicode(e[0]), u'The object is a descendant.')
 
         # Checks that p8 was not added two times
@@ -89,7 +89,7 @@ class DagTestCase(TestCase):
         self.assertRaises(ValidationError, p9.add_child, p2)
         try:
             p9.add_child(p2)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(unicode(e[0]), u'The object is an ancestor.')
 
         self.assertEqual(str(p1.descendants_tree()), """{<ConcreteNode: # 5>: {<ConcreteNode: # 7>: {}}, <ConcreteNode: # 6>: {<ConcreteNode: # 8>: {}, <ConcreteNode: # 9>: {}, <ConcreteNode: # 7>: {}}}""")
@@ -119,7 +119,7 @@ class DagTestCase(TestCase):
         self.assertRaises(ValidationError, p6.add_child, p6)
         try:
             p6.add_child(p6)
-        except ValidationError, e:
+        except ValidationError as e:
             self.assertEqual(unicode(e[0]), u'Self links are not allowed.')
 
         # Remove a link and test island

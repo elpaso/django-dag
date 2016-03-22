@@ -270,6 +270,10 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
     """
     Dag Edge factory
     """
+    try:
+        basestring
+    except NameError:
+        basestring = str
     if isinstance(node_model, basestring):
         try:
             node_model_name = node_model.split('.')[1]
