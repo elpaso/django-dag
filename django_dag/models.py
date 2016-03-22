@@ -118,7 +118,7 @@ class NodeBase(object):
 
     def descendants_edges_set(self, cached_results=None):
         """
-        Returns a set of descendants
+        Returns a set of descendants edges
         """
         if cached_results is None:
             cached_results = dict()
@@ -129,24 +129,24 @@ class NodeBase(object):
             for f in self.children.all():
                 res.add((self, f))
                 res.update(f.descendants_edges_set(cached_results=cached_results))
-                cached_results[self] = res
+            cached_results[self] = res
             return res
 
-    def anscestors_edges_set(self, cached_results=None):
+    def ancestors_edges_set(self, cached_results=None):
         """
-        Returns a set of descendants
+        Returns a set of ancestors edges
         """
         if cached_results is None:
             cached_results = dict()
-            if self in cached_results.keys():
-                return cached_results[self]
-            else:
-                res = set()
-                for f in self.children.all():
-                    res.add((f, self))
-                    res.update(f.anscestors_edges_set(cached_results=cached_results))
-                    cached_results[self] = res
-                return res
+        if self in cached_results.keys():
+            return cached_results[self]
+        else:
+            res = set()
+            for f in self.parents():
+                res.add((f, self))
+                res.update(f.ancestors_edges_set(cached_results=cached_results))
+            cached_results[self] = res
+            return res
 
     def nodes_set(self):
         """
@@ -164,7 +164,7 @@ class NodeBase(object):
         """
         edges = set()
         edges.update(self.descendants_edges_set())
-        edges.update(self.anscestors_edges_set())
+        edges.update(self.ancestors_edges_set())
         return edges
 
     def distance(self, target):
