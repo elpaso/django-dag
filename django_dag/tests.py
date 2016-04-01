@@ -77,7 +77,7 @@ class DagTestCase(TestCase):
         try:
             p2.add_child(p8)
         except ValidationError as e:
-            self.assertEqual(unicode(e[0]), u'The object is a descendant.')
+            self.assertEqual(e.message, 'The object is a descendant.')
 
         # Checks that p8 was not added two times
         l=[p.pk for p in p2.descendants_set()]
@@ -91,7 +91,7 @@ class DagTestCase(TestCase):
         try:
             p9.add_child(p2)
         except ValidationError as e:
-            self.assertEqual(unicode(e[0]), u'The object is an ancestor.')
+            self.assertEqual(e.message, 'The object is an ancestor.')
 
         self.assertEqual(str(p1.descendants_tree()), """{<ConcreteNode: # 5>: {<ConcreteNode: # 7>: {}}, <ConcreteNode: # 6>: {<ConcreteNode: # 8>: {}, <ConcreteNode: # 9>: {}, <ConcreteNode: # 7>: {}}}""")
         l=[p.pk for p in p1.descendants_set()]
