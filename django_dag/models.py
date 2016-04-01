@@ -186,7 +186,7 @@ class NodeBase(object):
             for d in self.children.all():
                 try:
                     desc_path = d.path(target)
-                    if not path or len(desc_path) < path:
+                    if not path or len(desc_path) < len(path):
                         path = [d] + desc_path
                 except NodeNotReachableException:
                     pass
