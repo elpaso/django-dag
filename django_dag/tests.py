@@ -53,9 +53,10 @@ class DagTestCase(TestCase):
 
         tree = p1.descendants_tree()
         # {<ConcreteNode: # 5>: {<ConcreteNode: # 7>: {}}}
-        self.assertEqual(tree.keys()[0], p5)
-        self.assertEqual(tree.values()[0].keys()[0], p7)
-        self.assertEqual(tree[tree.keys()[0]].values()[0], {})
+        self.assertIn(p5, tree)
+        self.assertEqual(len(tree), 1)
+        self.assertIn(p7, tree[p5])
+        self.assertEqual(tree[p5][p7], {})
 
         l=[p.pk for p in p1.descendants_set()]
         l.sort()
