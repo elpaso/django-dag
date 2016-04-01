@@ -6,8 +6,6 @@ Some ideas stolen from: from https://github.com/stdbrouw/django-treebeard-dag
 
 """
 
-from itertools import permutations
-
 from django.db import models
 from django.core.exceptions import ValidationError
 
@@ -118,6 +116,38 @@ class NodeBase(object):
             cached_results[self] = res
             return res
 
+    def descendants_edges_set(self, cached_results=None):
+        """
+        Returns a set of descendants edges
+        """
+        if cached_results is None:
+            cached_results = dict()
+        if self in cached_results.keys():
+            return cached_results[self]
+        else:
+            res = set()
+            for f in self.children.all():
+                res.add((self, f))
+                res.update(f.descendants_edges_set(cached_results=cached_results))
+            cached_results[self] = res
+            return res
+
+    def ancestors_edges_set(self, cached_results=None):
+        """
+        Returns a set of ancestors edges
+        """
+        if cached_results is None:
+            cached_results = dict()
+        if self in cached_results.keys():
+            return cached_results[self]
+        else:
+            res = set()
+            for f in self.parents():
+                res.add((f, self))
+                res.update(f.ancestors_edges_set(cached_results=cached_results))
+            cached_results[self] = res
+            return res
+
     def nodes_set(self):
         """
         Retrun a set of all nodes
@@ -133,12 +163,8 @@ class NodeBase(object):
         Returns a set of all edges
         """
         edges = set()
-        for edge in permutations(self.nodes_set(), 2):
-            try:
-                if edge[0].distance(edge[1]) == 1:
-                    edges.add(edge)
-            except (NodeNotReachableException, TypeError):
-                pass
+        edges.update(self.descendants_edges_set())
+        edges.update(self.ancestors_edges_set())
         return edges
 
     def distance(self, target):
@@ -160,7 +186,7 @@ class NodeBase(object):
             for d in self.children.all():
                 try:
                     desc_path = d.path(target)
-                    if not path or len(desc_path) < path:
+                    if not path or len(desc_path) < len(path):
                         path = [d] + desc_path
                 except NodeNotReachableException:
                     pass
@@ -244,6 +270,10 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
     """
     Dag Edge factory
     """
+    try:
+        basestring
+    except NameError:
+        basestring = str
     if isinstance(node_model, basestring):
         try:
             node_model_name = node_model.split('.')[1]
