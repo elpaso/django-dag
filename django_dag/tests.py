@@ -93,7 +93,17 @@ class DagTestCase(TestCase):
         except ValidationError as e:
             self.assertEqual(e.message, 'The object is an ancestor.')
 
-        self.assertEqual(str(p1.descendants_tree()), """{<ConcreteNode: # 5>: {<ConcreteNode: # 7>: {}}, <ConcreteNode: # 6>: {<ConcreteNode: # 8>: {}, <ConcreteNode: # 9>: {}, <ConcreteNode: # 7>: {}}}""")
+        tree = p1.descendants_tree()
+        self.assertIn(p5, tree)
+        self.assertIn(p6, tree)
+        self.assertIn(p7, tree[p5])
+        self.assertIn(p7, tree[p6])
+        self.assertIn(p8, tree[p6])
+        self.assertIn(p9, tree[p6])
+        self.assertEqual(len(tree), 2)
+        self.assertEqual(len(tree[p5]), 1)
+        self.assertEqual(len(tree[p6]), 3)
+
         l=[p.pk for p in p1.descendants_set()]
         l.sort()
         self.assertEqual(l, [5, 6, 7, 8, 9])
