@@ -109,16 +109,16 @@ class DagTestCase(TestCase):
         self.assertEqual(l, [5, 6, 7, 8, 9])
         self.assertEqual(p1.distance(p8), 2)
 
-        #Test additional fields for edge
-        p9.add_child(p10, name = 'test_name')
+        # Test additional fields for edge
+        p9.add_child(p10, name='test_name')
         self.assertEqual(p9.children.through.objects.filter(child=p10)[0].name, u'test_name')
 
-        self.assertEqual(str(p1.path(p7)), '[<ConcreteNode: # 6>, <ConcreteNode: # 7>]')
-        self.assertEqual(str(p1.path(p10)), '[<ConcreteNode: # 6>, <ConcreteNode: # 9>, <ConcreteNode: # 10>]')
+        self.assertEqual([p.name for p in p1.path(p7)], ['6', '7'])
+        self.assertEqual([p.name for p in p1.path(p10)], ['6', '9', '10'])
         self.assertEqual(p1.distance(p7), 2)
 
-        self.assertEqual(str(p1.get_leaves()), 'set([<ConcreteNode: # 8>, <ConcreteNode: # 10>, <ConcreteNode: # 7>])')
-        self.assertEqual(str(p8.get_roots()), 'set([<ConcreteNode: # 1>, <ConcreteNode: # 2>, <ConcreteNode: # 4>])')
+        self.assertEqual([p.name for p in p1.get_leaves()], ['8', '10', '7'])
+        self.assertEqual([p.name for p in p8.get_roots()], ['1', '2', '4'])
 
         self.assertTrue(p1.is_root())
         self.assertFalse(p1.is_leaf())
