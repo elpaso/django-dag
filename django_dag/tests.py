@@ -1,29 +1,31 @@
+import multiprocessing
 
 from django.test import TestCase
-from django_dag.models import *
-from django_dag.tree_test_output import *
+from django.db.models import CharField
+from django.shortcuts import render_to_response
+from django.core.exceptions import ValidationError
+from django_dag.models import node_factory, edge_factory
+from django_dag.tree_test_output import expected_tree_output
 
-import multiprocessing
-import os
-import time
-
-
-# Test classes
 
 class ConcreteNode(node_factory('ConcreteEdge')):
     """
     Test node, adds just one field
     """
-    name = models.CharField(max_length = 32)
+    name = CharField(max_length=32)
+
+    def __str__(self):
+        return '# %s' % self.name
 
     class Meta:
         app_label = 'django_dag'
 
-class ConcreteEdge(edge_factory('ConcreteNode', concrete = False)):
+
+class ConcreteEdge(edge_factory('ConcreteNode', concrete=False)):
     """
     Test edge, adds just one field
     """
-    name = models.CharField(max_length = 32, blank = True, null = True)
+    name = CharField(max_length=32, blank=True, null=True)
 
     class Meta:
         app_label = 'django_dag'
@@ -32,22 +34,19 @@ class ConcreteEdge(edge_factory('ConcreteNode', concrete = False)):
 class DagTestCase(TestCase):
 
     def setUp(self):
-        for i in range(1,11):
-            ConcreteNode(name = "%s" % i).save()
-
+        for i in range(1, 11):
+            ConcreteNode(name="%s" % i).save()
 
     def test_01_objects_were_created(self):
-        for i in range(1,11):
+        for i in range(1, 11):
             self.assertEqual(ConcreteNode.objects.get(name="%s" % i).name, "%s" % i)
-
 
     def test_02_dag(self):
         # Get nodes
-        for i in range(1,11):
+        for i in range(1, 11):
             globals()["p%s" % i] = ConcreteNode.objects.get(pk=i)
 
         # Creates a DAG
-        #from IPython import embed; embed()
         p1.add_child(p5)
         p5.add_child(p7)
 
@@ -58,7 +57,7 @@ class DagTestCase(TestCase):
         self.assertIn(p7, tree[p5])
         self.assertEqual(tree[p5][p7], {})
 
-        l=[p.pk for p in p1.descendants_set()]
+        l = [p.pk for p in p1.descendants_set()]
         l.sort()
         self.assertEqual(l, [5, 7])
 
@@ -67,12 +66,12 @@ class DagTestCase(TestCase):
         p3.add_child(p7)
         p6.add_child(p7)
         p6.add_child(p8)
-        l=[p.pk for p in p2.descendants_set()]
+        l = [p.pk for p in p2.descendants_set()]
         l.sort()
         self.assertEqual(l, [6, 7, 8])
 
         # ValidationError: [u'The object is a descendant.']
-        #self.assertRaises(ValidationError, p2.add_child, p8)
+        # self.assertRaises(ValidationError, p2.add_child, p8)
 
         try:
             p2.add_child(p8)
@@ -80,7 +79,7 @@ class DagTestCase(TestCase):
             self.assertEqual(e.message, 'The object is a descendant.')
 
         # Checks that p8 was not added two times
-        l=[p.pk for p in p2.descendants_set()]
+        l = [p.pk for p in p2.descendants_set()]
         l.sort()
         self.assertEqual(l, [6, 7, 8])
 
@@ -104,7 +103,7 @@ class DagTestCase(TestCase):
         self.assertEqual(len(tree[p5]), 1)
         self.assertEqual(len(tree[p6]), 3)
 
-        l=[p.pk for p in p1.descendants_set()]
+        l = [p.pk for p in p1.descendants_set()]
         l.sort()
         self.assertEqual(l, [5, 6, 7, 8, 9])
         self.assertEqual(p1.distance(p8), 2)
@@ -131,25 +130,23 @@ class DagTestCase(TestCase):
         try:
             p6.add_child(p6)
         except ValidationError as e:
-            self.assertEqual(unicode(e[0]), u'Self links are not allowed.')
+            self.assertEqual(e.message, 'Self links are not allowed.')
 
         # Remove a link and test island
         p10.remove_parent(p9)
         self.assertFalse(p10 in p9.descendants_set())
         self.assertTrue(p10.is_island())
 
-        self.assertEqual(str(p6.ancestors_set()), 'set([<ConcreteNode: # 1>, <ConcreteNode: # 2>, <ConcreteNode: # 4>])')
+        self.assertEqual([p.name for p in p6.ancestors_set()], ['1', '2', '4'])
 
         p1.remove_child(p6)
-        self.assertEqual(str(p6.ancestors_set()), 'set([<ConcreteNode: # 2>, <ConcreteNode: # 4>])')
+        self.assertEqual([p.name for p in p6.ancestors_set()], ['2', '4'])
 
         self.assertFalse(p1 in p6.ancestors_set())
 
         # Testing the view
-        from django.shortcuts import render_to_response
-        response = str(render_to_response('tree.html', { 'dag_list': ConcreteNode.objects.all()}))
-        self.assertEqual(response, expected_tree_output)
-
+        response = render_to_response('tree.html', { 'dag_list': ConcreteNode.objects.all()})
+        self.assertEqual(response.content.decode('utf-8'), expected_tree_output)
 
     def test_03_deep_dag(self):
         """

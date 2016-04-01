@@ -1,6 +1,4 @@
-expected_tree_output = '''Content-Type: text/html; charset=utf-8\r
-\r
-# 1
+expected_tree_output = '''# 1
 Descendants:
 # 5
 # 7
