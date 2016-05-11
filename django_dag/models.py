@@ -309,7 +309,6 @@ def node_factory(edge_model, children_null = True, base_model = models.Model):
 
         children  = models.ManyToManyField(
                 'self',
-                null        = children_null,
                 blank       = children_null,
                 symmetrical = False,
                 through     = edge_model,
