@@ -26,7 +26,7 @@ class NodeBase(object):
         ordering = ('-id',)
 
     def __unicode__(self):
-        return "# %s" % self.pk
+        return u"# %s" % self.pk
 
     def __str__(self):
         return self.__unicode__()
@@ -290,7 +290,7 @@ def edge_factory(node_model, child_to_field = "id", parent_to_field = "id", conc
         child = models.ForeignKey(node_model, related_name = "%s_parent" % node_model_name, to_field = child_to_field)
 
         def __unicode__(self):
-            return "%s is child of %s" % (self.child, self.parent)
+            return u"%s is child of %s" % (self.child, self.parent)
 
         def save(self, *args, **kwargs):
             if not kwargs.pop('disable_circular_check', False):
