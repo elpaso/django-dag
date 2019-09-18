@@ -25,3 +25,10 @@ Example::
         Test edge, adds just one field
         """
         name = models.CharField(max_length = 32, blank = True, null = True)
+
+
+Tests
+.....
+
+Unit tests can be run with just django installed at the base directory by running
+   `python manage.py test`
